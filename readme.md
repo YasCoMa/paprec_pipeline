@@ -29,13 +29,13 @@ We have developed a comprehensive pipeline for comparing models used in antigeni
 ### Run Screening:
 1. ````python3 multiple_method_dataset.py````
 2. Check the results obtained with those found in our article:
-    - Bcipep dataset: 
-    - HLA dataset:
-    - Gram+ dataset: 
+    - Bcipep dataset: https://www.dropbox.com/s/8ezeup4xiwb9p7n/bcipep_dataset.zip?dl=0
+    - HLA dataset: https://www.dropbox.com/s/6vpfgvmsz9vd5r0/hla_dataset.zip?dl=0
+    - Gram+ dataset: https://www.dropbox.com/s/l5wqpcsp4qc6ret/gram%2B_dataset.zip?dl=0
     - Gram- dataset: https://www.dropbox.com/s/cvzrhlselxj9sp5/gram-_dataset.zip?dl=0
 
 ### Run Comparison in Gram positive and negative bacteria (Optional) :
-1. Download and uncompress the following folder: 
+1. Download and uncompress the following folder: https://www.dropbox.com/s/27nnwhh1spl2038/gram_comparison.zip?dl=0
 2. ````python3 comparison_gram.py````
 
 ## Reference
