@@ -25,6 +25,7 @@ We have developed a comprehensive pipeline for comparing models used in antigeni
 ### Preparation:
 1. ````git clone https://github.com/YasCoMa/papc_pipeline.git````
 2. ````cd papc_pipeline````
+3. ````pip3 install -r requirements.txt````
 
 ### Run Screening:
 1. ````python3 multiple_method_dataset.py````
