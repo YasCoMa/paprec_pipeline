@@ -1,4 +1,4 @@
-# PAPC - Pipeline for Antigenicity Predictor Comparison
+# PAPreC - Pipeline for Antigenicity Predictor Comparison
 
 Python pipeline to prepare epitopes and protein sequence datasets, extract numerical features from sequence with alignment-free methods, perform model evaluation and test model performance upon feature selection.
 
@@ -23,8 +23,8 @@ We have developed a comprehensive pipeline for comparing models used in antigeni
 
 ## Usage Instructions
 ### Preparation:
-1. ````git clone https://github.com/YasCoMa/papc_pipeline.git````
-2. ````cd papc_pipeline````
+1. ````git clone https://github.com/YasCoMa/paprec_pipeline.git````
+2. ````cd paprec_pipeline````
 3. ````pip3 install -r requirements.txt````
 
 ### Run Screening:
@@ -42,4 +42,4 @@ We have developed a comprehensive pipeline for comparing models used in antigeni
 ## Reference
 
 ## Bug Report
-Please, use the [Issues](https://github.com/YasCoMa/papc_pipeline/issues) tab to report any bug.
+Please, use the [Issues](https://github.com/YasCoMa/paprec_pipeline/issues) tab to report any bug.
