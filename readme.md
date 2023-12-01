@@ -1,3 +1,5 @@
+<img role="button" tabindex="0" id="modal-653381303-trigger" aria-controls="modal-653381303" aria-expanded="false" class="doi-modal-trigger block m-0" src="https://zenodo.org/badge/DOI/10.5281/zenodo.10246165.svg" alt="DOI: 10.5281/zenodo.10246165">
+
 # PAPreC - Pipeline for Antigenicity Predictor Comparison
 
 Python pipeline to prepare epitopes and protein sequence datasets, extract numerical features from sequence with alignment-free methods, perform model evaluation and test model performance upon feature selection.
