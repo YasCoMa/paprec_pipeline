@@ -35,7 +35,7 @@ from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.neural_network import MLPClassifier
 
 from sklearn.metrics import roc_curve, auc
-from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, classification_report, confusion_matrix
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, classification_report, confusion_matrix, roc_auc_score, auc, precision_recall_curve
 
 from boruta import BorutaPy
 from sklearn.ensemble import RandomForestClassifier
@@ -543,7 +543,7 @@ class Screening_classifier:
         }
         
         f=open(ide+"/"+met+"/"+"result_cross-validation.txt","w")
-        f.write("dataset;mode;lag;classifier;f1;precision;recall;accuracy\n")
+        f.write("dataset;mode;lag;classifier;f1;precision;recall;accuracy;roc_auc\n")
         modes =['auto','cross']
         maxi_lag=8
         if(met=='method2' or met=='method3'):
@@ -576,9 +576,10 @@ class Screening_classifier:
                             precision=cross_val_score(clf, X, y, scoring='precision', cv=10)
                             recall=cross_val_score(clf, X, y, scoring='recall', cv=10) 
                             accuracy=cross_val_score(clf, X, y, scoring='accuracy', cv=10)
+                            roc_aucs=cross_val_score(clf, X, y, scoring='roc_auc', cv=10)
                     
                             for i in range(len(f1)):
-                                f.write(str(ds)+";"+m+";l"+str(lag)+";"+classifier+";"+str(f1[i])+";"+str(precision[i])+";"+str(recall[i])+";"+str(accuracy[i])+"\n")
+                                f.write(str(ds)+";"+m+";l"+str(lag)+";"+classifier+";"+str(f1[i])+";"+str(precision[i])+";"+str(recall[i])+";"+str(accuracy[i])+";"+str(roc_aucs[i])+"\n")
                             
                             ides="ds"+str(ds)+"_"+m+"_l"+str(lag)+"_"+classifier
                             self._auc_roc(ides, X, y, clf, ide, met)
@@ -605,7 +606,7 @@ class Screening_classifier:
     
     def check_standard_deviation(self, ide, met):
         g=open(ide+"/"+met+"/"+"summary_cross_validation_result.tsv","w")
-        g.write("dataset\tmode\tlag\tclassifier\tmean f1\tst dev f1\tmean precision\tst dev precision\tmean recall\tst dev recall\tmean accuracy\tst dev accuracy\n")
+        g.write("dataset\tmode\tlag\tclassifier\tmean f1\tst dev f1\tmean precision\tst dev precision\tmean recall\tst dev recall\tmean accuracy\tst dev accuracy\tmean roc_auc\tst dev roc_auc\tmean pr_auc\tst dev pr_auc\n")
         c=0
         
         ant=""
@@ -625,16 +626,20 @@ class Screening_classifier:
                     acc=[]
                     rec=[]
                     prec=[]
+                    rocauc=[]
+                    prauc=[]
                 
                 f1.append(float(l[4]))
                 prec.append(float(l[5]))
                 rec.append(float(l[6]))
                 acc.append(float(l[7]))
+                rocauc.append(float(l[8]))
+                prauc.append( auc( float(l[6]), float(l[5]) ) )
             c+=1
         f.close()
         
         if(ant!=""):
-            g.write(ant+"\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n" %(st.mean(f1), st.stdev(f1), st.mean(prec), st.stdev(prec), st.mean(rec), st.stdev(rec), st.mean(acc), st.stdev(acc)) )
+            g.write(ant+"\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n" %(st.mean(f1), st.stdev(f1), st.mean(prec), st.stdev(prec), st.mean(rec), st.stdev(rec), st.mean(acc), st.stdev(acc), st.mean(rocauc), st.stdev(rocauc), st.mean(prauc), st.stdev(prauc) ) )
         g.close()
 
 class Test_feature_selection:
@@ -735,7 +740,7 @@ class Test_feature_selection:
         X=[]
         Y=[]
         fg=open(ide+"/"+met+"/"+"feature_selection_results/model_results.tsv","w")
-        fg.write("dataset\tselected_features\tmode\tclassifier\taccuracy\tf1\tprecision\trecall\n")
+        fg.write("dataset\tselected_features\tmode\tclassifier\taccuracy\tf1\tprecision\trecall\troc_auc\tpr_auc\n")
         
         for ds in range(5):
             for m in modes:
@@ -784,8 +789,13 @@ class Test_feature_selection:
                         clf = AdaBoostClassifier()
                         clf.fit(X_filtered, Y)
                         predictions = clf.predict(X_test)
+                        predprob = clf.predict_proba(X_test)
                         
-                        fg.write("%i\t%s\t%s\t%s\t%.5f\t%.5f\t%.5f\t%.5f\n" %(ds, (','.join(sels)), m, classifier, accuracy_score(y_test, predictions), f1_score(y_test, predictions), precision_score(y_test, predictions), recall_score(y_test, predictions) ) )
+                        roc_auc = roc_auc_score(y_test, predprob)
+                        precision, recall, _ = precision_recall_curve(y_test, predprob)
+                        pr_auc = auc(recall, precision) 
+                        
+                        fg.write("%i\t%s\t%s\t%s\t%.5f\t%.5f\t%.5f\t%.5f\t%.5f\t%.5f\n" %(ds, (','.join(sels)), m, classifier, accuracy_score(y_test, predictions), f1_score(y_test, predictions), precision_score(y_test, predictions), recall_score(y_test, predictions), roc_auc, pr_auc ) )
                         
                         """with open("feature_selection_results/"+classifier+"_"+str(ds)+"_"+m+"_model_result.tsv","w") as fg:
                             fg.write('accuracy:'+str(accuracy_score(y_test, predictions))+"\n")
