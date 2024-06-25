@@ -15,6 +15,11 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+def warn(*args, **kwargs):
+    pass
+import warnings
+warnings.warn = warn
+
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import cross_val_predict
 from sklearn.model_selection import train_test_split
@@ -606,7 +611,8 @@ class Screening_classifier:
     
     def check_standard_deviation(self, ide, met):
         g=open(ide+"/"+met+"/"+"summary_cross_validation_result.tsv","w")
-        g.write("dataset\tmode\tlag\tclassifier\tmean f1\tst dev f1\tmean precision\tst dev precision\tmean recall\tst dev recall\tmean accuracy\tst dev accuracy\tmean roc_auc\tst dev roc_auc\tmean pr_auc\tst dev pr_auc\n")
+        #g.write("dataset\tmode\tlag\tclassifier\tmean f1\tst dev f1\tmean precision\tst dev precision\tmean recall\tst dev recall\tmean accuracy\tst dev accuracy\tmean roc_auc\tst dev roc_auc\tmean pr_auc\tst dev pr_auc\n")
+        g.write("dataset\tmode\tlag\tclassifier\tmean f1\tst dev f1\tmean precision\tst dev precision\tmean recall\tst dev recall\tmean accuracy\tst dev accuracy\tmean roc_auc\tst dev roc_auc\n")
         c=0
         
         ant=""
@@ -620,7 +626,8 @@ class Screening_classifier:
             if(c>0):
                 if('\t'.join(l[:4]) != ant):
                     if(ant!=""):
-                        g.write(ant+"\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n" %(st.mean(f1), st.stdev(f1), st.mean(prec), st.stdev(prec), st.mean(rec), st.stdev(rec), st.mean(acc), st.stdev(acc)) )
+                        g.write(ant+"\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n" %(st.mean(f1), st.stdev(f1), st.mean(prec), st.stdev(prec), st.mean(rec), st.stdev(rec), st.mean(acc), st.stdev(acc), st.mean(rocauc), st.stdev(rocauc) ) )
+                        #g.write(ant+"\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n" %(st.mean(f1), st.stdev(f1), st.mean(prec), st.stdev(prec), st.mean(rec), st.stdev(rec), st.mean(acc), st.stdev(acc), st.mean(rocauc), st.stdev(rocauc), st.mean(prauc), st.stdev(prauc) ) )
                     ant='\t'.join(l[:4])
                     f1=[]
                     acc=[]
@@ -634,12 +641,13 @@ class Screening_classifier:
                 rec.append(float(l[6]))
                 acc.append(float(l[7]))
                 rocauc.append(float(l[8]))
-                prauc.append( auc( float(l[6]), float(l[5]) ) )
+                #prauc.append( auc( float(l[6]), float(l[5]) ) )
             c+=1
         f.close()
         
         if(ant!=""):
-            g.write(ant+"\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n" %(st.mean(f1), st.stdev(f1), st.mean(prec), st.stdev(prec), st.mean(rec), st.stdev(rec), st.mean(acc), st.stdev(acc), st.mean(rocauc), st.stdev(rocauc), st.mean(prauc), st.stdev(prauc) ) )
+            g.write(ant+"\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n" %(st.mean(f1), st.stdev(f1), st.mean(prec), st.stdev(prec), st.mean(rec), st.stdev(rec), st.mean(acc), st.stdev(acc), st.mean(rocauc), st.stdev(rocauc) ) )
+            #g.write(ant+"\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n" %(st.mean(f1), st.stdev(f1), st.mean(prec), st.stdev(prec), st.mean(rec), st.stdev(rec), st.mean(acc), st.stdev(acc), st.mean(rocauc), st.stdev(rocauc), st.mean(prauc), st.stdev(prauc) ) )
         g.close()
 
 class Test_feature_selection:
