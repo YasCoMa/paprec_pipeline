@@ -601,8 +601,12 @@ class Screening_classifier:
     def _auc_roc(self, ides, X, y, clf, ide, met):
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.2, random_state=42)
         clf.fit(X_train, y_train)
-        predictions = clf.predict_proba(X_test)
-        
+        try:
+            predictions = clf.predict_proba(X_test)
+            predictions = np.array(predictions)[:, 1]
+        except:
+            predictions = clf.predict(X_test)
+            
         false_positive_rate, true_positive_rate, thresholds = roc_curve(y_test, predictions)
         roc_auc = auc(false_positive_rate, true_positive_rate)
         if(roc_auc >= 0.6):
@@ -616,7 +620,7 @@ class Screening_classifier:
             plt.ylabel('True Positive Rate')
             plt.xlabel('False Positive Rate')
             f.savefig(ide+"/"+met+"/"+'performance_aucroc/'+ides+'roc_auc.png')        
- 
+        
     def check_standard_deviation(self, ide, met):
         g=open(ide+"/"+met+"/"+"summary_cross_validation_result.tsv","w")
         g.write("dataset\tmode\tlag\tclassifier\tmean f1\tst dev f1\tmean precision\tst dev precision\tmean recall\tst dev recall\tmean accuracy\tst dev accuracy\tmean roc_auc\tst dev roc_auc\tmean pr_auc\tst dev pr_auc\n")
@@ -807,7 +811,11 @@ class Test_feature_selection:
                         clf = AdaBoostClassifier()
                         clf.fit(X_filtered, Y)
                         predictions = clf.predict(X_test)
-                        predprob = clf.predict_proba(X_test)
+                        try:
+                            predprob = clf.predict_proba(X_test)
+                            predprob = np.array(predprob)[:, 1]
+                        except:
+                            predprob = predictions
                         
                         roc_auc = roc_auc_score(y_test, predprob)
                         precision, recall, _ = precision_recall_curve(y_test, predprob)
