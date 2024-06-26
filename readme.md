@@ -16,7 +16,7 @@ We have developed a comprehensive pipeline for comparing models used in antigeni
 ## Requirements:
 * Python packages needed:
 	- pip3 install numpy
-	- pip3 install sklearn
+	- pip3 install scikit-learn
 	- pip3 install pandas
 	- pip3 install matplotlib
 	- pip3 install statistics
