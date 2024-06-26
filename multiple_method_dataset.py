@@ -41,11 +41,17 @@ from sklearn.neural_network import MLPClassifier
 
 from sklearn.metrics import roc_curve, auc
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, classification_report, confusion_matrix, roc_auc_score, auc, precision_recall_curve
+from sklearn.metrics import make_scorer
 
 from boruta import BorutaPy
 from sklearn.ensemble import RandomForestClassifier
 
 import statistics as st
+
+def scoring_prauc(ytrue, ypred, **kwargs):
+    prec, rec, _ = precision_recall_curve(ytrue, ypred)
+    prauc = auc(prec, rec)
+    return prauc
 
 class Implementation_vaxijen:
     descriptors={}
@@ -548,7 +554,7 @@ class Screening_classifier:
         }
         
         f=open(ide+"/"+met+"/"+"result_cross-validation.txt","w")
-        f.write("dataset;mode;lag;classifier;f1;precision;recall;accuracy;roc_auc\n")
+        f.write("dataset;mode;lag;classifier;f1;precision;recall;accuracy;roc_auc;pr_auc\n")
         modes =['auto','cross']
         maxi_lag=8
         if(met=='method2' or met=='method3'):
@@ -556,6 +562,8 @@ class Screening_classifier:
             fasta_pos=ide+"/"+met+"/dataset_pos.fasta"
             fasta_neg=ide+"/"+met+"/dataset_neg.fasta"
             maxi_lag=self._get_optimal_lag(fasta_pos, fasta_neg)
+        
+        prauc_scorer = make_scorer(scoring_prauc, greater_is_better=True)
             
         for ds in range(5):
             for m in modes:
@@ -581,9 +589,10 @@ class Screening_classifier:
                             recall=cross_val_score(clf, X, y, scoring='recall', cv=10) 
                             accuracy=cross_val_score(clf, X, y, scoring='accuracy', cv=10)
                             roc_aucs=cross_val_score(clf, X, y, scoring='roc_auc', cv=10)
-                    
+                            praucs=cross_val_score(clf, X, y, scoring=prauc_scorer, cv=10)
+                            
                             for i in range(len(f1)):
-                                f.write(str(ds)+";"+m+";l"+str(lag)+";"+classifier+";"+str(f1[i])+";"+str(precision[i])+";"+str(recall[i])+";"+str(accuracy[i])+";"+str(roc_aucs[i])+"\n")
+                                f.write(str(ds)+";"+m+";l"+str(lag)+";"+classifier+";"+str(f1[i])+";"+str(precision[i])+";"+str(recall[i])+";"+str(accuracy[i])+";"+str(roc_aucs[i])+";"+str(praucs[i])+"\n")
                             
                             ides="ds"+str(ds)+"_"+m+"_l"+str(lag)+"_"+classifier
                             self._auc_roc(ides, X, y, clf, ide, met)
@@ -596,18 +605,18 @@ class Screening_classifier:
         
         false_positive_rate, true_positive_rate, thresholds = roc_curve(y_test, predictions)
         roc_auc = auc(false_positive_rate, true_positive_rate)
-        f = plt.figure()
-        plt.title('ROC Curve - Compilation)')
-        plt.plot(false_positive_rate, true_positive_rate, 'b', label='AUC = %0.2f'% roc_auc)
-        plt.legend(loc='lower right')
-        plt.plot([0,1],[0,1],'r--')
-        plt.xlim([-0.1,1.2])
-        plt.ylim([-0.1,1.2])
-        plt.ylabel('True Positive Rate')
-        plt.xlabel('False Positive Rate')
-        f.savefig(ide+"/"+met+"/"+'performance_aucroc/'+ides+'roc_auc.png')        
+        if(roc_auc >= 0.6):
+            f = plt.figure()
+            plt.title('ROC Curve - Compilation)')
+            plt.plot(false_positive_rate, true_positive_rate, 'b', label='AUC = %0.2f'% roc_auc)
+            plt.legend(loc='lower right')
+            plt.plot([0,1],[0,1],'r--')
+            plt.xlim([-0.1,1.2])
+            plt.ylim([-0.1,1.2])
+            plt.ylabel('True Positive Rate')
+            plt.xlabel('False Positive Rate')
+            f.savefig(ide+"/"+met+"/"+'performance_aucroc/'+ides+'roc_auc.png')        
  
-    
     def check_standard_deviation(self, ide, met):
         g=open(ide+"/"+met+"/"+"summary_cross_validation_result.tsv","w")
         #g.write("dataset\tmode\tlag\tclassifier\tmean f1\tst dev f1\tmean precision\tst dev precision\tmean recall\tst dev recall\tmean accuracy\tst dev accuracy\tmean roc_auc\tst dev roc_auc\tmean pr_auc\tst dev pr_auc\n")
@@ -620,14 +629,15 @@ class Screening_classifier:
         rec=[]
         prec=[]
         rocauc=[]
+        prauc=[]
         f=open(ide+"/"+met+"/"+"result_cross-validation.txt","r")
         for line in f:
             l=line.replace("\n","").split(";")
             if(c>0):
                 if('\t'.join(l[:4]) != ant):
                     if(ant!=""):
-                        g.write(ant+"\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n" %(st.mean(f1), st.stdev(f1), st.mean(prec), st.stdev(prec), st.mean(rec), st.stdev(rec), st.mean(acc), st.stdev(acc), st.mean(rocauc), st.stdev(rocauc) ) )
-                        #g.write(ant+"\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n" %(st.mean(f1), st.stdev(f1), st.mean(prec), st.stdev(prec), st.mean(rec), st.stdev(rec), st.mean(acc), st.stdev(acc), st.mean(rocauc), st.stdev(rocauc), st.mean(prauc), st.stdev(prauc) ) )
+                        #g.write(ant+"\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n" %(st.mean(f1), st.stdev(f1), st.mean(prec), st.stdev(prec), st.mean(rec), st.stdev(rec), st.mean(acc), st.stdev(acc), st.mean(rocauc), st.stdev(rocauc) ) )
+                        g.write(ant+"\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n" %(st.mean(f1), st.stdev(f1), st.mean(prec), st.stdev(prec), st.mean(rec), st.stdev(rec), st.mean(acc), st.stdev(acc), st.mean(rocauc), st.stdev(rocauc), st.mean(prauc), st.stdev(prauc) ) )
                     ant='\t'.join(l[:4])
                     f1=[]
                     acc=[]
@@ -641,13 +651,13 @@ class Screening_classifier:
                 rec.append(float(l[6]))
                 acc.append(float(l[7]))
                 rocauc.append(float(l[8]))
-                #prauc.append( auc( float(l[6]), float(l[5]) ) )
+                prauc.append( float(l[9]) )
             c+=1
         f.close()
         
         if(ant!=""):
-            g.write(ant+"\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n" %(st.mean(f1), st.stdev(f1), st.mean(prec), st.stdev(prec), st.mean(rec), st.stdev(rec), st.mean(acc), st.stdev(acc), st.mean(rocauc), st.stdev(rocauc) ) )
-            #g.write(ant+"\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n" %(st.mean(f1), st.stdev(f1), st.mean(prec), st.stdev(prec), st.mean(rec), st.stdev(rec), st.mean(acc), st.stdev(acc), st.mean(rocauc), st.stdev(rocauc), st.mean(prauc), st.stdev(prauc) ) )
+            #g.write(ant+"\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n" %(st.mean(f1), st.stdev(f1), st.mean(prec), st.stdev(prec), st.mean(rec), st.stdev(rec), st.mean(acc), st.stdev(acc), st.mean(rocauc), st.stdev(rocauc) ) )
+            g.write(ant+"\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n" %(st.mean(f1), st.stdev(f1), st.mean(prec), st.stdev(prec), st.mean(rec), st.stdev(rec), st.mean(acc), st.stdev(acc), st.mean(rocauc), st.stdev(rocauc), st.mean(prauc), st.stdev(prauc) ) )
         g.close()
 
 class Test_feature_selection:
