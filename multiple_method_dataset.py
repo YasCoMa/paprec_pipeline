@@ -560,7 +560,6 @@ class Screening_classifier:
         for ds in range(5):
             for m in modes:
                 for lag in range(1, maxi_lag+1):
-                    print(ds, m, lag)
                     
                     df=pd.read_csv(ide+"/"+met+"/"+"random_datasets/"+str(ds)+"_"+m+"_dataset.tsv", sep="\t")
                     x = df[ df['lag']=='l'+str(lag) ]
@@ -620,13 +619,14 @@ class Screening_classifier:
         acc=[]
         rec=[]
         prec=[]
+        rocauc=[]
         f=open(ide+"/"+met+"/"+"result_cross-validation.txt","r")
         for line in f:
             l=line.replace("\n","").split(";")
             if(c>0):
                 if('\t'.join(l[:4]) != ant):
                     if(ant!=""):
-                        g.write(ant+"\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n" %(st.mean(f1), st.stdev(f1), st.mean(prec), st.stdev(prec), st.mean(rec), st.stdev(rec), st.mean(acc), st.stdev(acc), st.mean(rocauc), st.stdev(rocauc) ) )
+                        g.write(ant+"\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n" %(st.mean(f1), st.stdev(f1), st.mean(prec), st.stdev(prec), st.mean(rec), st.stdev(rec), st.mean(acc), st.stdev(acc), st.mean(rocauc), st.stdev(rocauc) ) )
                         #g.write(ant+"\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n" %(st.mean(f1), st.stdev(f1), st.mean(prec), st.stdev(prec), st.mean(rec), st.stdev(rec), st.mean(acc), st.stdev(acc), st.mean(rocauc), st.stdev(rocauc), st.mean(prauc), st.stdev(prauc) ) )
                     ant='\t'.join(l[:4])
                     f1=[]
@@ -646,7 +646,7 @@ class Screening_classifier:
         f.close()
         
         if(ant!=""):
-            g.write(ant+"\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n" %(st.mean(f1), st.stdev(f1), st.mean(prec), st.stdev(prec), st.mean(rec), st.stdev(rec), st.mean(acc), st.stdev(acc), st.mean(rocauc), st.stdev(rocauc) ) )
+            g.write(ant+"\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n" %(st.mean(f1), st.stdev(f1), st.mean(prec), st.stdev(prec), st.mean(rec), st.stdev(rec), st.mean(acc), st.stdev(acc), st.mean(rocauc), st.stdev(rocauc) ) )
             #g.write(ant+"\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n" %(st.mean(f1), st.stdev(f1), st.mean(prec), st.stdev(prec), st.mean(rec), st.stdev(rec), st.mean(acc), st.stdev(acc), st.mean(rocauc), st.stdev(rocauc), st.mean(prauc), st.stdev(prauc) ) )
         g.close()
 
@@ -707,7 +707,7 @@ class Test_feature_selection:
             modes =['auto']
         for i in range(5):
             for m in modes:
-                print(ide+"/"+met+"/"+m+"_dataset_consolidated.tsv")
+                #print(ide+"/"+met+"/"+m+"_dataset_consolidated.tsv")
                 df=pd.read_csv(ide+"/"+met+"/"+m+"_dataset_consolidated.tsv", sep="\t")
                 pieces=[]
                 auxdf=df[ (df['class']==1) ]
@@ -857,20 +857,20 @@ class Running_config:
                     
                 print("----------- Screening_classifier")
                 b=Screening_classifier()
-                print("executing 1...")
+                print("\texecuting 1...")
                 b.prepare_random_datasets(ds, m)
-                print("executing 2...")
+                print("\texecuting 2...")
                 b.test_cross_validation(ds, m)
-                print("executing 3...")
+                print("\texecuting 3...")
                 b.check_standard_deviation(ds, m)
                     
                 print("----------- Test_feature_selection")
                 c=Test_feature_selection()
-                print("executing 1...")
+                print("\texecuting 1...")
                 c.prepare_condensed_dataset(ds, m)
-                print("executing 2...")
+                print("\texecuting 2...")
                 c.prepare_random_datasets(ds, m)
-                print("executing 3...")
+                print("\texecuting 3...")
                 c.execute_feature_selection(ds, m)
                 
 r = Running_config()
