@@ -22,6 +22,7 @@ We have developed a comprehensive pipeline for comparing models used in antigeni
 	- pip3 install statistics
 	- pip3 install boruta
 	- pip3 install joblib
+* Or run: conda env create --file paprec_env.yml
 
 ## Usage Instructions
 ### Preparation:
