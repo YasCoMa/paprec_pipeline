@@ -786,7 +786,7 @@ class Test_feature_selection:
                 X.to_csv(ide+"/"+met+"/"+"feature_selection_results/"+str(ds)+"_"+m+"_features_selection_dataset.tsv", sep='\t')
                 
                 for classifier in clfs.keys():
-                    print("-----", ds, m, classifier)
+                    #print("-----", ds, m, classifier)
                     
                     #forest = RandomForestClassifier(n_jobs=-1,  max_depth=5)
                     forest=eval(clfs[classifier])
@@ -858,7 +858,7 @@ class Running_config:
                 if(not os.path.isdir(ds+"/"+m)):
                     self._init_folders_for_new_ds(ds, m)
                     
-                print(">>>>>>>>>>>>>>>>>> Stage ", ds, m, "<<<<<<<<<<<<<<<<<<<<<<<")
+                print("\n>>>>>>>>>>>>>>>>>> Stage ", ds, m, "<<<<<<<<<<<<<<<<<<<<<<<")
                     
                 print("----------- Preparing dataset")
                 modes =['auto','cross']
