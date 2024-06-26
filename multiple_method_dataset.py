@@ -601,7 +601,7 @@ class Screening_classifier:
     def _auc_roc(self, ides, X, y, clf, ide, met):
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.2, random_state=42)
         clf.fit(X_train, y_train)
-        predictions = clf.predict(X_test)
+        predictions = clf.predict_proba(X_test)
         
         false_positive_rate, true_positive_rate, thresholds = roc_curve(y_test, predictions)
         roc_auc = auc(false_positive_rate, true_positive_rate)
@@ -619,8 +619,8 @@ class Screening_classifier:
  
     def check_standard_deviation(self, ide, met):
         g=open(ide+"/"+met+"/"+"summary_cross_validation_result.tsv","w")
-        #g.write("dataset\tmode\tlag\tclassifier\tmean f1\tst dev f1\tmean precision\tst dev precision\tmean recall\tst dev recall\tmean accuracy\tst dev accuracy\tmean roc_auc\tst dev roc_auc\tmean pr_auc\tst dev pr_auc\n")
-        g.write("dataset\tmode\tlag\tclassifier\tmean f1\tst dev f1\tmean precision\tst dev precision\tmean recall\tst dev recall\tmean accuracy\tst dev accuracy\tmean roc_auc\tst dev roc_auc\n")
+        g.write("dataset\tmode\tlag\tclassifier\tmean f1\tst dev f1\tmean precision\tst dev precision\tmean recall\tst dev recall\tmean accuracy\tst dev accuracy\tmean roc_auc\tst dev roc_auc\tmean pr_auc\tst dev pr_auc\n")
+        #g.write("dataset\tmode\tlag\tclassifier\tmean f1\tst dev f1\tmean precision\tst dev precision\tmean recall\tst dev recall\tmean accuracy\tst dev accuracy\tmean roc_auc\tst dev roc_auc\n")
         c=0
         
         ant=""
@@ -637,7 +637,7 @@ class Screening_classifier:
                 if('\t'.join(l[:4]) != ant):
                     if(ant!=""):
                         #g.write(ant+"\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n" %(st.mean(f1), st.stdev(f1), st.mean(prec), st.stdev(prec), st.mean(rec), st.stdev(rec), st.mean(acc), st.stdev(acc), st.mean(rocauc), st.stdev(rocauc) ) )
-                        g.write(ant+"\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n" %(st.mean(f1), st.stdev(f1), st.mean(prec), st.stdev(prec), st.mean(rec), st.stdev(rec), st.mean(acc), st.stdev(acc), st.mean(rocauc), st.stdev(rocauc), st.mean(prauc), st.stdev(prauc) ) )
+                        g.write(ant+"\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n" %(st.mean(f1), st.stdev(f1), st.mean(prec), st.stdev(prec), st.mean(rec), st.stdev(rec), st.mean(acc), st.stdev(acc), st.mean(rocauc), st.stdev(rocauc), st.mean(prauc), st.stdev(prauc) ) )
                     ant='\t'.join(l[:4])
                     f1=[]
                     acc=[]
@@ -657,7 +657,7 @@ class Screening_classifier:
         
         if(ant!=""):
             #g.write(ant+"\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n" %(st.mean(f1), st.stdev(f1), st.mean(prec), st.stdev(prec), st.mean(rec), st.stdev(rec), st.mean(acc), st.stdev(acc), st.mean(rocauc), st.stdev(rocauc) ) )
-            g.write(ant+"\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n" %(st.mean(f1), st.stdev(f1), st.mean(prec), st.stdev(prec), st.mean(rec), st.stdev(rec), st.mean(acc), st.stdev(acc), st.mean(rocauc), st.stdev(rocauc), st.mean(prauc), st.stdev(prauc) ) )
+            g.write(ant+"\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n" %(st.mean(f1), st.stdev(f1), st.mean(prec), st.stdev(prec), st.mean(rec), st.stdev(rec), st.mean(acc), st.stdev(acc), st.mean(rocauc), st.stdev(rocauc), st.mean(prauc), st.stdev(prauc) ) )
         g.close()
 
 class Test_feature_selection:
